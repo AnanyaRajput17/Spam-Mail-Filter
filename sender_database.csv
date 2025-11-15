@@ -1,0 +1,15 @@
+SenderEmail,Frequency,Status
+spammer@scam.com,1,Normal
+C:\Users\anany\Desktop\CPBL\stack.c,1,Normal
+ananya@gmail.com,3,Normal
+free-money@scam.com,1,Blacklisted
+hacker@malware.net,1,Blacklisted
+ananyaarajput2003@gmail.com,6,Normal
+given@gmail.com,1,Blacklisted
+boss@company.com,1,Whitelisted
+hii@gmail.com,1,Normal
+trusted_contact@personal.org,1,Whitelisted
+amit@gmail.com,1,Normal
+annaya@gmail.com,1,Normal
+hello@gmail.com,1,Whitelisted
+mahi@gmail.cm,1,Whitelisted

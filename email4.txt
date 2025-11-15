@@ -1,0 +1,9 @@
+Urgent action required.
+
+Your account has been temporarily suspended due to a security issue.
+ We have detected an unusual login.
+
+Please login immediately to verify your account and prevent permanent closure.
+
+See the attached file for instructions and to secure your account. 
+Failure to verify your password will result in account deletion.

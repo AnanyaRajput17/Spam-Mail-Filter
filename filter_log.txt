@@ -1,0 +1,6 @@
+Email from: hacker@malware.net | To: user@target.com | Subject: "Urgent Password Reset" | Final Status: BLOCKED
+Email from: trusted_contact@personal.org | To: user@target.com | Subject: "Project Update" | Final Status: DELIVERED
+Email from: unknown@source.co | To: user@target.com | Subject: "Win a Prize Now!" | Final Status: BLOCKED
+Email from: employee@company.com | To: another@target.com | Subject: "Fwd: Internal Memo" | Final Status: DELIVERED
+Email from: spammer@scam.com | To: my_email@inbox.com | Subject: "You won a prize!" | Final Status: BLOCKED
+Email from: ananya@gmail.com | To: divya@gmail.com | Subject: "Visiting soon" | Final Status: DELIVERED

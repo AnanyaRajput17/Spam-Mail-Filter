@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Filter Interface</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group input {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        #btn-filter { background-color: #007bff; }
+        #btn-filter:hover { background-color: #0056b3; }
+        
+        #btn-whitelist { background-color: #28a745; }
+        #btn-whitelist:hover { background-color: #218838; }
+        
+        #btn-blacklist { background-color: #dc3545; }
+        #btn-blacklist:hover { background-color: #c82333; }
+
+        .db-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        #result-status {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        #log-output {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-family: "Consolas", "Monaco", monospace;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Spam Filter Interface</h1>
+
+        <h2>Process New Email</h2>
+        <div class="form-group">
+            <label for="sender">Sender Email:</label>
+            <input type="text" id="sender" placeholder="e.g., spammer@scam.com">
+        </div>
+        <div class="form-group">
+            <label for="body-file">Body Filename:</label>
+            <input type="text" id="body-file" placeholder="e.g., test_spam_body.txt">
+        </div>
+        <div class="form-group">
+            <label for="attachments">Attachments (space-separated):</label>
+            <input type="text" id="attachments" placeholder="e.g., file1.exe file2.jpg">
+        </div>
+        <button id="btn-filter">Check Email</button>
+        
+        <div id="result-status" style="display:none;"></div>
+
+        <h2>Manage Sender Database</h2>
+        <div class="form-group">
+            <label for="db-email">Sender Email:</label>
+            <input type="text" id="db-email" placeholder="e.g., friend@example.com">
+        </div>
+        <div class="db-buttons">
+            <button id="btn-whitelist">Add to Whitelist</button>
+            <button id="btn-blacklist">Add to Blacklist</button>
+        </div>
+
+        <h2>C Program Log</h2>
+        <pre id="log-output">Awaiting command...</pre>
+    </div>
+
+    <script>
+        // --- Get all the HTML elements ---
+        const btnFilter = document.getElementById('btn-filter');
+        const btnWhitelist = document.getElementById('btn-whitelist');
+        const btnBlacklist = document.getElementById('btn-blacklist');
+        
+        const resultStatus = document.getElementById('result-status');
+        const logOutput = document.getElementById('log-output');
+
+        // --- Event Listener for the "Check Email" button ---
+        btnFilter.addEventListener('click', async () => {
+            const sender = document.getElementById('sender').value;
+            const body_file = document.getElementById('body-file').value;
+            const attachments = document.getElementById('attachments').value.split(' ').filter(Boolean); // Get
+
+            // Send data to the Flask backend
+            const response = await fetch('/filter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sender, body_file, attachments })
+            });
+            
+            const data = await response.json();
+
+            if (data.error) {
+                alert('Error: ' + data.error);
+                logOutput.textContent = data.error;
+            } else {
+                // Update status
+                resultStatus.style.display = 'block';
+                if (data.status === 'BLOCKED') {
+                    resultStatus.textContent = 'Status: BLOCKED';
+                    resultStatus.style.color = '#dc3545';
+                    resultStatus.style.backgroundColor = '#f8d7da';
+                } else if (data.status === 'CLEAN') {
+                    resultStatus.textContent = 'Status: CLEAN';
+                    resultStatus.style.color = '#28a745';
+                    resultStatus.style.backgroundColor = '#d4edda';
+                }
+                
+                logOutput.textContent = data.log;
+            }
+        });
+
+        
+        async function handleManageDB(action) {
+            const email = document.getElementById('db-email').value;
+            if (!email) {
+                alert('Please enter an email address.');
+                return;
+            }
+
+            const response = await fetch('/manage_db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, email })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                alert('Error: ' + data.error);
+                logOutput.textContent = data.error;
+            } else {
+                // Show success message from C program
+                alert(data.message);
+                logOutput.textContent = data.message;
+                document.getElementById('db-email').value = ''; // Clear input
+            }
+        }
+        
+        btnWhitelist.addEventListener('click', () => handleManageDB('-whitelist'));
+        btnBlacklist.addEventListener('click', () => handleManageDB('-blacklist'));
+
+    </script>
+
+</body>
+</html>
